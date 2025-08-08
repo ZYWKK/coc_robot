@@ -1145,3 +1145,60 @@
 /build/自动脚本/xref-自动脚本.html
 /dist/
 /build/
+# Python 编译产生的文件
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 虚拟环境
+venv/
+env/
+.venv/
+ENV/
+
+# IDE 编辑器配置
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# pip 依赖文件
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Jupyter Notebook 检查点
+.ipynb_checkpoints/
+
+# 日志文件
+*.log
+
+# dotenv 文件（通常包含敏感信息）
+.env
+.env.*
+
+# 本地数据库
+*.sqlite3
+
+# 覆盖率报告
+htmlcov/
+.coverage
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# 单元测试缓存
+.pytest_cache/
+
+# mypy 静态检查缓存
+.mypy_cache/
+.dmypy.json
+
+# VSCode Python 调试配置缓存
+__pypackages__/
+
+#数据库文件
+*.db
