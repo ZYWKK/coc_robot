@@ -6,7 +6,7 @@ import threading
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Tuple, Any
 
 from 工具包.工具函数 import 生成贝塞尔轨迹
 from 数据库.任务数据库 import 任务数据库
@@ -32,6 +32,22 @@ class 任务上下文:
     # def 置脚本状态(self, 日志内容:str, 超时的时间:float=60):
     #     print(f"[机器人消息] {self.机器人标志} {time.strftime('%Y年%m月%d日 %H:%M:%S')}: {日志内容}")
     #     self.数据库.记录日志(self.机器人标志, 日志内容, time.time() + 超时的时间)
+
+    def 记录正常(self, 文本: str, 超时的时间: float = 60):
+        self.置脚本状态(文本, 超时的时间)
+
+    def 记录警告(self, 文本: str, 超时的时间: float = 60):
+        try:
+            self.置脚本状态(文本, 超时的时间, 级别="警告")
+        except TypeError:
+            # 兼容旧签名
+            self.置脚本状态("[警告] " + 文本, 超时的时间)
+
+    def 记录错误(self, 文本: str, 超时的时间: float = 60):
+        try:
+            self.置脚本状态(文本, 超时的时间, 级别="错误")
+        except TypeError:
+            self.置脚本状态("[错误] " + 文本, 超时的时间)
 
     def 发送重启请求(self, 原因: str):
         """发送重启请求并终止当前线程"""
@@ -119,6 +135,8 @@ class 基础任务(ABC):
     """游戏任务基类"""
     def __init__(self,上下文: '任务上下文'):
         self.上下文=上下文
+        # 一些子类会在构造函数里初始化 模板识别；基类声明属性以通过类型检查
+        self.模板识别: Any = None
 
     @abstractmethod
     def 执行(self, 上下文: '任务上下文') -> bool:
@@ -149,6 +167,8 @@ class 基础任务(ABC):
         返回:
             是否匹配, (x, y) 坐标
         """
+        if self.模板识别 is None:
+            raise RuntimeError("模板识别引擎未初始化")
         x1, y1, x2, y2 = 区域
         屏幕图像 = self.上下文.op.获取屏幕图像cv(x1, y1, x2, y2)
         是否匹配, (x, y), _ = self.模板识别.执行匹配(屏幕图像, 模板路径, 相似度阈值)

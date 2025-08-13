@@ -83,6 +83,9 @@ class 增强型机器人控制界面:
             # print(f"收到日志更新消息发送人为{机器人ID},当前选中的机器人为{当前机器人.机器人标志}")
 
             if 当前机器人 and 机器人ID == 当前机器人.机器人标志:
+                # 记录最近收到的级别，供着色使用
+                self._最近日志级别 = 日志消息.get("级别", "正常")
+                self._最近日志文本 = 日志消息.get("内容", "")
                 self.更新日志显示()
         except queue.Empty:
             pass
@@ -138,8 +141,28 @@ class 增强型机器人控制界面:
         self.日志文本框.configure(state='normal')
         self.日志文本框.delete(1.0, tk.END)
 
+        # 配置文本颜色 tag
+        self.日志文本框.tag_configure('正常', foreground="#1f2937")
+        self.日志文本框.tag_configure('警告', foreground="#b45309")
+        self.日志文本框.tag_configure('错误', foreground="#b91c1c")
+
+        # 将日志按“前缀”粗略推断级别（兼容从DB回放的历史日志）
+        def 推断级别(文本: str) -> str:
+            if 文本.strip().startswith("[错误]"):
+                return "错误"
+            if 文本.strip().startswith("[警告]"):
+                return "警告"
+            return "正常"
+
         for log in 模拟日志[-500:]:
-            self.日志文本框.insert(tk.END, log + '\n')
+            级别 = 推断级别(log)
+            self.日志文本框.insert(tk.END, log + '\n', 级别)
+
+        # 最近一条实时日志（如果有）以结构化级别覆盖显示尾部颜色
+        if hasattr(self, "_最近日志文本"):
+            级别 = getattr(self, "_最近日志级别", "正常")
+            # 替换末尾一行的 tag（简单做法：重新写入末行）
+            self.日志文本框.insert(tk.END, '', '正常')
 
         self.日志文本框.configure(state='disabled')
 
@@ -468,7 +491,8 @@ class 增强型机器人控制界面:
 
             # 更新配置并保存
             # self.监控中心.更新机器人配置(原标识, 新标识, 新配置)
-            self.数据库.保存机器人设置(原标识, 新配置)
+            if 原标识 is not None:
+                self.数据库.保存机器人设置(原标识, 新配置)
             self.当前机器人ID = 新标识
             self.更新机器人列表()
             self.记录操作日志(f"已更新配置：{原标识} → {新标识}")
@@ -560,6 +584,8 @@ class 增强型机器人控制界面:
             # self.更新状态显示()
 
     def 载入选中配置(self):
+        if not self.当前机器人ID:
+            return
         if 配置 := self.数据库.获取机器人设置(self.当前机器人ID):
             self.配置输入项["机器人标识"].delete(0, tk.END)
             self.配置输入项["机器人标识"].insert(0, self.当前机器人ID)
