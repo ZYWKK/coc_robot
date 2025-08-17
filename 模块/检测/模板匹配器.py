@@ -8,6 +8,7 @@ from pathlib import Path
 from collections import OrderedDict
 from typing import Tuple, Optional, Union
 
+
 class 模板匹配引擎:
     """带缓存的线程安全模板匹配引擎（单例模式）"""
     _单例实例 = None
@@ -35,7 +36,6 @@ class 模板匹配引擎:
         """
         if self.__class__._已初始化:
             return
-
 
         # 初始化路径配置
         资源目录 = self.获取资源目录()
@@ -90,7 +90,7 @@ class 模板匹配引擎:
 
         return 模板图像
 
-    def 执行匹配(self,底图: np.ndarray, 模板路径: Union[str, list], 相似度阈值=0.8,匹配算法=cv2.TM_CCOEFF_NORMED,调试模式=False) -> Tuple[bool, Tuple[int, int], Optional[np.ndarray]]:
+    def 执行匹配(self, 底图: np.ndarray, 模板路径: Union[str, list], 相似度阈值=0.8, 匹配算法=cv2.TM_CCOEFF_NORMED, 调试模式=False) -> Tuple[bool, Tuple[int, int], Optional[np.ndarray]]:
         """执行模板匹配操作
 
         参数：
@@ -189,8 +189,8 @@ if __name__ == "__main__":
     实例2 = 模板匹配引擎()
     print(f"单例验证：{id(实例1) == id(实例2)}")
 
-
     # 模拟多线程测试
+
     def 测试任务(线程名称):
         底图 = cv2.imread(r"D:\yolo\coc\images\69906343.bmp")
         结果 = 引擎.执行匹配(
@@ -201,7 +201,6 @@ if __name__ == "__main__":
         print(11)
         if 结果[0]:
             cv2.imwrite(f"{线程名称}1.jpg", 结果[2])
-
 
     # 创建测试线程
     线程列表 = []

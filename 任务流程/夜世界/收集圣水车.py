@@ -12,9 +12,10 @@ class 滑动配置:
 class 收集圣水车任务(夜世界基础任务):
     MAX_连续失败次数 = 5  # 定义最大允许失败次数常量
     收集圣水连续出错次数 = 0  # 初始化计数器
+
     def __init__(self, 上下文: '任务上下文'):
         super().__init__(上下文)
-        #self
+        # self
 
     def 执行(self) -> bool:
         try:
@@ -36,7 +37,8 @@ class 收集圣水车任务(夜世界基础任务):
                     self.上下文.置脚本状态("定位到圣水车，开始收集")
                     self.上下文.点击(x - 118, y + 46)
 
-                    if self.是否出现图片("夜世界_圣水车界面.bmp"):
+                    # 判断是否打开了圣水车
+                    if (self.是否包含文本(self.执行OCR识别((328, 92, 489, 131)), "圣水车")):
                         self.上下文.点击(605, 471)  # 收集圣水
                         self.上下文.脚本延时(1000)
                         self.上下文.点击(699, 103)  # 关闭界面
@@ -45,8 +47,9 @@ class 收集圣水车任务(夜世界基础任务):
                     else:
                         self.上下文.置脚本状态("未找到圣水车界面，收集失败")
                         self._处理失败()
-                        self.上下文.键盘.按字符按压("esc")
+                        # self.上下文.键盘.按字符按压("esc")
                         return True
+
                 else:
                     找不到夜世界船的次数 += 1
                     self.上下文.置脚本状态(f"定位圣水车位置中... ({找不到夜世界船的次数}/5)")
@@ -74,4 +77,10 @@ class 收集圣水车任务(夜世界基础任务):
         """统一处理异常"""
         super().异常处理(异常)
         self.上下文.发送重启请求(f"任务[{self.__class__.__name__}] 异常: {异常}")
+        return False
+
+    def 是否包含文本(self, result: list, target: str) -> bool:
+        for item in result:
+            if len(item) > 1 and target in str(item[1]):
+                return True
         return False
