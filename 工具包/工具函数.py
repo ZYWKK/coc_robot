@@ -63,9 +63,12 @@ def 是否夜世界资源打满(资源字典: dict) -> bool:
         return str(数值).endswith("000") or str(数值).endswith("00000")
 
     return (
-            是打满(资源字典.get("金币", 0)) and
-            是打满(资源字典.get("圣水", 0))
+            是打满(资源字典.get("金币", 0))
     )
+    # return (
+    #         是打满(资源字典.get("金币", 0)) and
+    #         是打满(资源字典.get("圣水", 0))
+    # )
 
 def 单行资源识别(ocr引擎, img):
     img = cv2.resize(img, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
